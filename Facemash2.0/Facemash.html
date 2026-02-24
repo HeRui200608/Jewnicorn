@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FACEMASH</title>
+
+<style>
+body{
+    margin:0;
+    background:linear-gradient(to bottom,#8b2a2a 0px,#8b2a2a 120px,#f7f4f4 120px,#f7f7f7 100%);
+    font-family: "Times New Roman", Times, serif;
+    color:#000;
+}
+
+.header{
+    text-align:center;
+    font-size:56px;
+    font-weight:bold;
+    letter-spacing:2px;
+    color:white;
+    padding-top:25px;
+}
+
+.tagline{
+    text-align:center;
+    margin-top:40px;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.question{
+    text-align:center;
+    margin-top:10px;
+    font-size:30px;
+    font-weight:bold;
+}
+
+.wrapper{
+    width:900px;
+    margin:50px auto;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.card{
+    width:280px;
+    text-align:center;
+    cursor:pointer;
+}
+
+.card img{
+    width:260px;
+    height:340px;
+    object-fit:cover;
+    border:1px solid #888;
+    background:#fff;
+}
+
+.name{
+    margin-top:12px;
+    font-size:18px;
+    color:#181717;
+}
+
+.or{
+    margin:0 40px;
+    font-size:18px;
+    color:#333;
+}
+
+.footer{
+    text-align:center;
+    margin-top:80px;
+    font-size:14px;
+    color:#003366;
+}
+
+.footer span{
+    margin:0 8px;
+    cursor:pointer;
+}
+
+
+.export-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background: #8b2a2a;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 14px;
+    z-index: 100;
+}
+
+.export-btn:hover {
+    background: #6d2020;
+}
+
+
+#matrix {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+    z-index: 9999;
+    user-select: none;
+}
+
+
+@keyframes blink {
+    0% { opacity: 1; text-shadow: 0 0 5px #0f0, 0 0 10px #0f0; }
+    100% { opacity: 0.7; text-shadow: 0 0 15px #0f0, 0 0 20px #0f0; }
+}
+
+@keyframes brightPulse {
+    0% { color: #0f0; opacity: 0.8; }
+    50% { color: #3ff; opacity: 1; }
+    100% { color: #0f0; opacity: 0.8; }
+}
+
+@keyframes glitch {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-2px); }
+    40% { transform: translateX(2px); }
+    60% { transform: translateX(-1px); }
+    80% { transform: translateX(1px); }
+    100% { transform: translateX(0); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">FACEMASH</div>
+<div class="tagline">Were we let in for our looks? No. Will we be judged on them? Yes.</div>
+<div class="question">Who's Hotter? Click to Choose.</div>
+
+<div class="wrapper">
+    <div class="card" onclick="choose('left')">
+        <img id="leftImg">
+        <div class="name" id="leftName"></div>
+    </div>
+    <div class="or">OR</div>
+    <div class="card" onclick="choose('right')">
+        <img id="rightImg">
+        <div class="name" id="rightName"></div>
+    </div>
+</div>
+
+<div class="footer">
+    <span>ABOUT</span> | <span>BLOG</span> | <span>TERMS</span> | <span>COLLUIT</span> | 
+    (C)2003 FOEHN | MATTER PHOTO | RANDOM
+</div>
+<div class="producer">
+Produced by Jamie·Weinberg(CEO but not bitch) and Maxine(CFO without investment) and Elsa(CTO the extra)
+</div>
+<button class="export-btn" onclick="exportVotesData()">EXPORT VOTES DATA</button>
+
+<script>
+const K = 32;
+let people = [
+{ name:"Andrew Garfield", img:"D:/Facemash2.0/images/AD.JPG", rating:1500 },
+{ name:"Jesse Eisenberg", img:"D:/Facemash2.0/images/JE.JPG", rating:1500 },
+{ name:"Eduardo Saverin", img:"D:/Facemash2.0/images/ES.jpg", rating:1500 },
+{ name:"Mark Zuckberg", img:"D:/Facemash2.0/images/MZ.JPG", rating:1500 },
+{ name:"Sophie Marceau(male)", img:"D:/Facemash2.0/images/Sophie.jpg", rating:1500 },
+{ name:"Peter Paker", img:"D:/Facemash2.0/images/PP.JPG", rating:1500 },
+{ name:"Doss", img:"D:/Facemash2.0/images/Doss.JPG", rating:1500 },
+{ name:"Tobias", img:"D:/Facemash2.0/images/Tobias.JPG", rating:1500 },
+{ name:"Sam", img:"D:/Facemash2.0/images/Sam.JPG", rating:1500 },
+{ name:"Jim", img:"D:/Facemash2.0/images/jim.JPG", rating:1500 },
+{ name:"Rodrigues", img:"D:/Facemash2.0/images/Rodrigues.JPG", rating:1500 },
+{ name:"James", img:"D:/Facemash2.0/images/James.jpg", rating:1500 },
+{ name:"Robin", img:"D:/Facemash2.0/images/Robin.JPG", rating:1500 },
+{ name:"John", img:"D:/Facemash2.0/images/John.JPG", rating:1500 },
+{ name:"Link", img:"D:/Facemash2.0/images/Link.JPG", rating:1500 },
+{ name:"Columbus", img:"D:/Facemash2.0/images/columbus.JPG", rating:1500 },
+{ name:"Tom", img:"D:/Facemash2.0/images/IMG_1977.JPG", rating:1500 },
+{ name:"Daniel", img:"D:/Facemash2.0/images/Daniel.jpg", rating:1500 },
+{ name:"Tommy", img:"D:/Facemash2.0/images/IMG_1976.JPG", rating:1500 },
+{ name:"JDA", img:"D:/Facemash2.0/images/JDA.JPG", rating:1500 },
+{ name:"Red Riding", img:"D:/Facemash2.0/images/IMG_1989.JPG", rating:1500 },
+{ name:"Lex Luthor", img:"D:/Facemash2.0/images/Lex.JPG", rating:1500 },
+{ name:"Cry Baby", img:"D:/Facemash2.0/images/IMG_1980.JPG", rating:1500 },
+{ name:"Blue(a bird.yeah)", img:"D:/Facemash2.0/images/blue.JPG", rating:1500 },
+{ name:"KID Andy", img:"D:/Facemash2.0/images/IMG_1981.JPG", rating:1500 },
+{ name:"Nick", img:"D:/Facemash2.0/images/NIck.jpg", rating:1500 },
+{ name:"Handsome guy", img:"D:/Facemash2.0/images/IMG_1978.JPG", rating:1500 },
+{ name:"lil Bunny", img:"D:/Facemash2.0/images/IMG_1988.JPG", rating:1500 },
+{ name:"FIREEEE", img:"D:/Facemash2.0/images/IMG_1986.JPG", rating:1500 },
+{ name:"Jack", img:"./images/Jack.jpg", rating:1500 },
+{ name:"??WTFBro", img:"./images/IMG_1987.JPG", rating:1500 },
+{ name:"My Professor", img:"./images/IMG_1982.JPG", rating:1500 },
+{ name:"HHOOLLAAA", img:"./images/IMG_1985.JPG", rating:1500 },
+{ name:"i love travel", img:"./images/IMG_1984.JPG", rating:1500 },
+{ name:"why am i so good?", img:"./images/IMG_1979.JPG", rating:1500 }
+];
+
+
+function expectedScore(rA, rB){ return 1 / (1 + Math.pow(10, (rB - rA)/400)); }
+function updateRating(winner, loser){
+    let expectedWin = expectedScore(winner.rating, loser.rating);
+    let expectedLose = expectedScore(loser.rating, winner.rating);
+    winner.rating = Math.round(winner.rating + K * (1 - expectedWin));
+    loser.rating = Math.round(loser.rating + K * (0 - expectedLose));
+}
+
+
+let totalVotes = 0;
+let votesHistory = [];
+function recordVote(winner, loser){
+    totalVotes++;
+    votesHistory.push({
+        timestamp: new Date().toISOString(),
+        winner: { name: winner.name, ratingBefore: winner.rating - K * (1 - expectedScore(winner.rating, loser.rating)), ratingAfter: winner.rating },
+        loser: { name: loser.name, ratingBefore: loser.rating - K * (0 - expectedScore(loser.rating, winner.rating)), ratingAfter: loser.rating }
+    });
+    document.title = "FACEMASH | Votes: " + totalVotes;
+}
+
+
+function exportVotesData() {
+    const exportData = { totalVotes, exportTime: new Date().toISOString(), votesHistory, currentRatings: people.map(p => ({ name: p.name, rating: p.rating, img: p.img })) };
+    const jsonData = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `facemash_votes_${new Date().getTime()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
+}
+
+
+let leftPerson;
+let rightPerson;
+function randomPerson(exclude){
+    let filtered = people.filter(p => p.name !== exclude);
+    return filtered[Math.floor(Math.random() * filtered.length)];
+}
+function render(){
+    document.getElementById("leftImg").src = leftPerson.img;
+    document.getElementById("leftName").innerText = leftPerson.name;
+    document.getElementById("rightImg").src = rightPerson.img;
+    document.getElementById("rightName").innerText = rightPerson.name;
+}
+
+const MELTDOWN_THRESHOLD = 180
+let meltdownTriggered = false;
+
+
+function choose(side){
+    if(side === "left"){
+        recordVote(leftPerson, rightPerson);
+        updateRating(leftPerson, rightPerson);
+        rightPerson = randomPerson(leftPerson.name);
+    } else {
+        recordVote(rightPerson, leftPerson);
+        updateRating(rightPerson, leftPerson);
+        leftPerson = randomPerson(rightPerson.name);
+    }
+    render();
+    if(totalVotes >= MELTDOWN_THRESHOLD && !meltdownTriggered){ meltdown(); }
+}
+
+
+function init(){
+    leftPerson = people[Math.floor(Math.random()*people.length)];
+    rightPerson = randomPerson(leftPerson.name);
+    render();
+}
+
+
+function getRandomChar() {
+    const charLibs = {
+        basic: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        special: '!@#$%^&*()_+-=[]{}|;:,.<>?/\\',
+        errorCodes: ['404', '500', '503', '418', 'SYN', 'ACK', 'FIN', 'RST', 'HTTP/1.1'],
+        binary: '01',
+        easterEgg: ['FACE', 'MASH', 'VOTE', 'RATE', 'CRASH']
+    };
+    const type = Math.random();
+    if (type < 0.4) return charLibs.basic[Math.floor(Math.random() * charLibs.basic.length)];
+    if (type < 0.6) return charLibs.special[Math.floor(Math.random() * charLibs.special.length)];
+    if (type < 0.8) return charLibs.binary[Math.floor(Math.random() * charLibs.binary.length)];
+    if (type < 0.98) return charLibs.errorCodes[Math.floor(Math.random() * charLibs.errorCodes.length)];
+    return charLibs.easterEgg[Math.floor(Math.random() * charLibs.easterEgg.length)];
+}
+
+
+function getRandomIP() {
+    return `${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`;
+}
+
+
+function generateScreenData(rows, cols) {
+    let screen = '';
+    for(let i=0; i<rows; i++){
+        let row = '';
+        for(let j=0; j<cols; j++){
+         
+            const char = getRandomChar();
+            if(Math.random() < 0.1){
+                row += `<span style="animation: brightPulse 0.8s infinite; color:#3ff;">${char}</span>`;
+            } else if(Math.random() < 0.05){
+                row += `<span style="animation: glitch 0.2s infinite; color:#f03;">${char}</span>`;
+            } else {
+                row += char;
+            }
+        }
+        screen += row + '\n';
+    }
+    return screen;
+}
+
+
+function meltdown() {
+    meltdownTriggered = true;
+    
+  
+    document.body.innerHTML = '';
+    document.body.style.background = '#000';
+    
+   
+    const matrixContainer = document.createElement('div');
+    matrixContainer.id = 'matrix';
+    document.body.appendChild(matrixContainer);
+
+    
+    const header = document.createElement('div');
+    header.style.cssText = `
+        position: fixed; top: 20px; left: 20px; color: #0f0; font-size: 28px; z-index: 10000;
+        animation: blink 0.5s infinite alternate; font-family: 'Courier New', monospace;
+    `;
+    header.innerHTML = `
+        <div>FACEMASH SYSTEM OVERLOAD</div>
+        <div style="font-size: 16px; margin-top: 10px;">
+            VOTES: ${totalVotes} | IP: ${getRandomIP()} | STATUS: CRASHING
+        </div>
+    `;
+    document.body.appendChild(header);
+
+
+    const screen = document.createElement('div');
+    screen.style.cssText = `
+        width: 100%; height: 100%; font-size: 14px; line-height: 1.2; color: #0f0;
+        font-family: 'Courier New', monospace; white-space: pre; overflow: hidden;
+        padding: 80px 20px 20px 20px; box-sizing: border-box;
+    `;
+    matrixContainer.appendChild(screen);
+
+
+    function playTypeSound() {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.type = 'square';
+        oscillator.frequency.value = 400 + Math.random() * 200;
+        gainNode.gain.value = 0.02;
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.01);
+    }
+
+    
+    const rows = Math.floor(window.innerHeight / 16); 
+    const cols = Math.floor(window.innerWidth / 8);   
+    setInterval(() => {
+        screen.innerHTML = generateScreenData(rows, cols);
+       
+        if(Math.random() < 0.3) playTypeSound();
+    }, 100); 
+
+  
+    setTimeout(() => {
+        matrixContainer.innerHTML = `
+            <div style="
+                width: 100%; height: 100%; display: flex; flex-direction: column;
+                justify-content: center; align-items: center; color: #0f0;
+                font-family: 'Courier New', monospace; font-size: 24px;
+                text-shadow: 0 0 10px #0f0;
+            ">
+                <div style="animation: blink 1s infinite;">SYSTEM CRASHED</div>
+                <div style="font-size: 18px; margin-top: 20px;">Facemash has been shut down</div>
+                <div style="font-size: 14px; margin-top: 10px;">Total votes: ${totalVotes}</div>
+                <div style="font-size: 12px; margin-top: 30px; color: #f03; animation: glitch 0.5s infinite;">
+                    ERROR: 418 - thank u 4 using^^
+                </div>
+            </div>
+        `;
+    }, 30000);
+}
+
+
+const ADMIN_KEY = "9274";
+let urlParams = new URLSearchParams(window.location.search);
+let isAdmin = (urlParams.get("mode")==="admin" && urlParams.get("key")===ADMIN_KEY);
+if(isAdmin){
+    const panel = document.createElement("div");
+    panel.style.cssText = `
+        position: fixed; top: 0; right: 0; background: white; padding: 20px;
+        border: 1px solid black; max-height: 100vh; overflow: auto;
+    `;
+    panel.innerHTML = "<h3>ADMIN RANKING</h3>";
+    const sorted = [...people].sort((a,b)=>b.rating-a.rating);
+    sorted.forEach(p=>{ panel.innerHTML += p.name + " - " + p.rating + "<br>"; });
+    document.body.appendChild(panel);
+}
+
+init();
+</script>
+</body>
+</html>
